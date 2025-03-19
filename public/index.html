@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Login - Course Registration</title>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex justify-center items-center h-screen">
+
+    <div class="bg-white p-6 rounded-lg shadow-md w-96">
+        <h2 class="text-xl font-semibold mb-4 text-center">Login</h2>
+
+        <label class="block mb-2">Select Role:</label>
+        <select id="role" class="border p-2 w-full mb-3 rounded">
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
+        </select>
+
+        <input type="text" id="identifier" class="border p-2 w-full mb-3 rounded" placeholder="Roll Number / Username">
+        <input type="password" id="password" class="border p-2 w-full mb-3 rounded hidden" placeholder="Password">
+
+        <button onclick="login()" class="bg-blue-500 text-white px-4 py-2 rounded w-full">Login</button>
+    </div>
+
+</body>
+
+</html>
