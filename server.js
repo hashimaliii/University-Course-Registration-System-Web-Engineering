@@ -1,46 +1,36 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
+const express = require('express');
+const dotenv = require('dotenv');
+const path = require('path');
+const connectDB = require('./config/db');
+
+// Load environment variables
+dotenv.config();
+
+// Connect to database
+connectDB();
 
 const app = express();
+
+// Body parser middleware
 app.use(express.json());
-app.use(cors());
+app.use(express.urlencoded({ extended: false }));
 
-const http = require("http");
-const { Server } = require("socket.io");
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')));
 
-const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
-const PORT = process.env.PORT || 5000;
+// Set view engine
+app.set('view engine', 'ejs');
 
-mongoose
-    // .connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-    .connect(process.env.DB_URL)
-    .then(() => console.log("MongoDB connected"))
-    .catch((err) => console.error(err));
+// Routes
+app.use('/api/users', require('./routes/api/users'));
+app.use('/api/courses', require('./routes/api/courses'));
+app.use('/api/registrations', require('./routes/api/registrations'));
+app.use('/api/reports', require('./routes/api/reports'));
+app.use('/api/seed', require('./routes/api/seed'));
+app.use('/', require('./routes/index'));
 
-app.get("/", (req, res) => {
-    res.send("University Registration System API is Running");
-});
+// Define port
+const PORT = process.env.PORT || 3000;
 
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-io.on("connection", (socket) => {
-    console.log("User connected");
-
-    socket.on("subscribe", async (courseId) => {
-        socket.join(courseId);
-    });
-
-    socket.on("updateSeats", async (courseId) => {
-        const course = await Course.findById(courseId);
-        io.to(courseId).emit("seatUpdate", course.seats);
-    });
-
-    socket.on("disconnect", () => {
-        console.log("User disconnected");
-    });
-});
-
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
