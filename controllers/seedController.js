@@ -1,41 +1,52 @@
 const User = require('../models/user');
-const Course = require('../models/course');
 
-// @desc    Seed initial data
-// @route   POST /api/seed
-// @access  Public (but should be secured in production)
-exports.seedInitialData = async (req, res) => {
+// Initialize default users for the system
+exports.initializeDefaultUsers = async (req, res) => {
     try {
-        // Check if admin exists
-        const adminExists = await User.findOne({ role: 'admin' });
+        // Check if an admin user already exists
+        const existingAdmin = await User.findOne({ role: 'admin' });
 
-        if (!adminExists) {
-            // Create default admin
+        if (!existingAdmin) {
             await User.create({
-                rollNumber: 'admin123',
-                name: 'System Administrator',
-                password: 'admin123',
+                rollNumber: 'admin001',
+                name: 'Admin User',
+                password: 'Admin@1234',
                 role: 'admin'
             });
         }
 
-        // Create your student account
-        const studentExists = await User.findOne({ rollNumber: '22F-3636' });
+        // Check if the sample student exists
+        const studentExists = await User.findOne({ rollNumber: '22F-0000' });
 
         if (!studentExists) {
             await User.create({
-                rollNumber: '22F-3636',
-                name: 'Gohar Ellahi',
-                password: 'Fast@3636',
+                rollNumber: '22F-0000',
+                name: 'Sample Student',
+                password: 'Student@0000',
                 role: 'student'
             });
         }
 
+        // Optional: Add more sample data or other user roles if required
+
         res.status(200).json({
             success: true,
-            message: 'Database seeded successfully with initial users'
+            message: 'Default admin and sample student created successfully.'
         });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+// Additional function to reset the user collection for development purposes
+exports.resetUsers = async (req, res) => {
+    try {
+        await User.deleteMany({});
+        res.status(200).json({
+            success: true,
+            message: 'All users have been removed from the database.'
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
     }
 };

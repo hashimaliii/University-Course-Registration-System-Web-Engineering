@@ -1,20 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const courseController = require('../../controllers/courseController');
-const { protect, admin } = require('../../middleware/auth');
+const { verifyAuth, requireAdmin } = require('../../middleware/auth');
 
-// Get all courses / create new course
+// Get all courses or add a new course (Admin only)
 router.route('/')
-    .get(courseController.getCourses)
-    .post(protect, admin, courseController.createCourse);
+    .get(courseController.getAllCourses)
+    .post(verifyAuth, requireAdmin, courseController.addCourse);
 
-// Get, update, delete course by ID
+// Manage course by ID (Admin required for updates and deletion)
 router.route('/:id')
-    .get(courseController.getCourseById)
-    .put(protect, admin, courseController.updateCourse)
-    .delete(protect, admin, courseController.deleteCourse);
+    .get(courseController.getCourseDetails)
+    .put(verifyAuth, requireAdmin, courseController.modifyCourse)
+    .delete(verifyAuth, requireAdmin, courseController.removeCourse);
 
-// Subscribe to course notifications
-router.post('/:id/subscribe', protect, courseController.subscribeToCourse);
+// Subscribe to course notifications (Authenticated users only)
+router.post('/:id/subscribe', verifyAuth, courseController.subscribeToCourse);
+
+// Get courses based on filters (e.g., department, level)
+router.get('/filter', courseController.getAllCourses);
 
 module.exports = router;
